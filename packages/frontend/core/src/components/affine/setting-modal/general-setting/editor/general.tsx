@@ -14,8 +14,10 @@ import {
   SettingWrapper,
 } from '@affine/component/setting-components';
 import { useAppSettingHelper } from '@affine/core/hooks/affine/use-app-setting-helper';
-import type { FontData } from '@affine/core/modules/system-font-family/entities/system-font-family';
-import { SystemFontFamilyService } from '@affine/core/modules/system-font-family/services/system-font-family';
+import {
+  type FontData,
+  SystemFontFamilyService,
+} from '@affine/core/modules/system-font-family';
 import { useI18n } from '@affine/i18n';
 import {
   type AppSetting,
@@ -120,7 +122,9 @@ Scroller.displayName = 'Scroller';
 const FontMenuItems = ({ onSelect }: { onSelect: (font: string) => void }) => {
   const systemFontFamily = useService(SystemFontFamilyService).systemFontFamily;
   useEffect(() => {
-    systemFontFamily.loadFontList();
+    if (systemFontFamily.fontList$.value.length === 0) {
+      systemFontFamily.loadFontList();
+    }
     systemFontFamily.clearSearch();
   }, [systemFontFamily]);
 
