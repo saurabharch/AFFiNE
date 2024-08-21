@@ -7,7 +7,11 @@ import {
   InformationIcon,
   KeyboardIcon,
 } from '@blocksuite/icons/rc';
-import { useLiveData, useServices } from '@toeverything/infra';
+import {
+  FeatureFlagService,
+  useLiveData,
+  useServices,
+} from '@toeverything/infra';
 import type { ReactElement, SVGProps } from 'react';
 import { useEffect } from 'react';
 
@@ -33,14 +37,23 @@ export type GeneralSettingList = GeneralSettingListItem[];
 
 export const useGeneralSettingList = (): GeneralSettingList => {
   const t = useI18n();
-  const { authService, serverConfigService, userFeatureService } = useServices({
+  const {
+    authService,
+    serverConfigService,
+    userFeatureService,
+    featureFlagService,
+  } = useServices({
     AuthService,
     ServerConfigService,
     UserFeatureService,
+    FeatureFlagService,
   });
   const status = useLiveData(authService.session.status$);
   const hasPaymentFeature = useLiveData(
     serverConfigService.serverConfig.features$.map(f => f?.payment)
+  );
+  const enableEditorSettings = useLiveData(
+    featureFlagService.flags.enable_editor_settings.$
   );
 
   useEffect(() => {
@@ -67,7 +80,7 @@ export const useGeneralSettingList = (): GeneralSettingList => {
       testId: 'about-panel-trigger',
     },
   ];
-  if (runtimeConfig.enableEditorSettings) {
+  if (enableEditorSettings) {
     // add editor settings to second position
     settings.splice(1, 0, {
       key: 'editor',

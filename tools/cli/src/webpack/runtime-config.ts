@@ -28,7 +28,6 @@ export function getRuntimeConfig(buildFlags: BuildFlags): RuntimeConfig {
         enableNewSettingUnstableApi: false,
         enableEnhanceShareMode: false,
         enableThemeEditor: false,
-        enableEditorSettings: false,
       };
     },
     get beta() {
@@ -57,7 +56,6 @@ export function getRuntimeConfig(buildFlags: BuildFlags): RuntimeConfig {
         enableInfoModal: true,
         enableOrganize: true,
         enableThemeEditor: true,
-        enableEditorSettings: true,
       };
     },
   };

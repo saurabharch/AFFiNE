@@ -32,7 +32,6 @@ export const runtimeFlagsSchema = z.object({
   enableInfoModal: z.boolean(),
   enableOrganize: z.boolean(),
   enableThemeEditor: z.boolean(),
-  enableEditorSettings: z.boolean(),
 });
 
 export type RuntimeConfig = z.infer<typeof runtimeFlagsSchema>;
