@@ -1,5 +1,4 @@
 import { notify, Skeleton } from '@affine/component';
-import { PublicLinkDisableModal } from '@affine/component/disable-public-link';
 import { Button } from '@affine/component/ui/button';
 import { Menu, MenuItem, MenuTrigger } from '@affine/component/ui/menu';
 import { openSettingModalAtom } from '@affine/core/atoms';
@@ -14,10 +13,10 @@ import { WorkspaceFlavour } from '@affine/env/workspace';
 import { PublicPageMode } from '@affine/graphql';
 import { useI18n } from '@affine/i18n';
 import {
+  BlockIcon,
   CollaborationIcon,
   DoneIcon,
   EdgelessIcon,
-  LinkIcon,
   LockIcon,
   PageIcon,
   SingleSelectSelectSolidIcon,
@@ -26,7 +25,7 @@ import {
 import { useLiveData, useService } from '@toeverything/infra';
 import { cssVar } from '@toeverything/theme';
 import { useSetAtom } from 'jotai';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { CloudSvg } from '../cloud-svg';
@@ -75,9 +74,6 @@ export const AFFiNESharePage = (props: ShareMenuProps) => {
   const baseUrl = useLiveData(serverConfig.config$.map(c => c?.baseUrl));
   const isLoading =
     isSharedPage === null || sharedMode === null || baseUrl === null;
-  const [showDisable, setShowDisable] = useState(false);
-
-  const currentDocMode = useLiveData(editor.mode$);
 
   const permissionService = useService(WorkspacePermissionService);
   const isOwner = useLiveData(permissionService.permission.isOwner$);
@@ -152,14 +148,7 @@ export const AFFiNESharePage = (props: ShareMenuProps) => {
       });
       console.log(err);
     }
-    setShowDisable(false);
   }, [shareInfoService, t]);
-
-  const onClickDisable = useCallback(() => {
-    if (isSharedPage) {
-      setShowDisable(true);
-    }
-  }, [isSharedPage]);
 
   const isMac = environment.isBrowser && environment.isMacOs;
 
@@ -211,7 +200,7 @@ export const AFFiNESharePage = (props: ShareMenuProps) => {
                   preFix={
                     <LockIcon className={styles.publicMenuItemPrefixStyle} />
                   }
-                  onSelect={onClickDisable}
+                  onSelect={onDisablePublic}
                   className={styles.menuItemStyle}
                 >
                   <div className={styles.publicItemRowStyle}>
@@ -257,20 +246,9 @@ export const AFFiNESharePage = (props: ShareMenuProps) => {
           <div className={styles.labelStyle}>
             {t['com.affine.share-menu.option.permission.label']()}
           </div>
-          <Menu
-            contentOptions={{
-              align: 'end',
-            }}
-            items={
-              <MenuItem>
-                {t['com.affine.share-menu.option.permission.can-edit']()}
-              </MenuItem>
-            }
-          >
-            <MenuTrigger className={styles.menuTriggerStyle} disabled>
-              {t['com.affine.share-menu.option.permission.can-edit']()}
-            </MenuTrigger>
-          </Menu>
+          <Button className={styles.menuTriggerStyle} disabled>
+            {t['com.affine.share-menu.option.permission.can-edit']()}
+          </Button>
         </div>
       </div>
       {isOwner && (
@@ -325,24 +303,13 @@ export const AFFiNESharePage = (props: ShareMenuProps) => {
               </MenuItem>
               <MenuItem
                 preFix={
-                  <LinkIcon className={styles.publicMenuItemPrefixStyle} />
+                  <BlockIcon className={styles.publicMenuItemPrefixStyle} />
                 }
                 className={styles.menuItemStyle}
                 onSelect={onCopyBlockLink}
               >
                 {t['com.affine.share-menu.copy.block']()}
               </MenuItem>
-              {currentDocMode === 'edgeless' && (
-                <MenuItem
-                  preFix={
-                    <LinkIcon className={styles.publicMenuItemPrefixStyle} />
-                  }
-                  className={styles.menuItemStyle}
-                  onSelect={onCopyBlockLink}
-                >
-                  {t['com.affine.share-menu.copy.frame']()}
-                </MenuItem>
-              )}
             </>
           }
         >
@@ -352,12 +319,6 @@ export const AFFiNESharePage = (props: ShareMenuProps) => {
           />
         </Menu>
       </div>
-
-      <PublicLinkDisableModal
-        open={showDisable}
-        onConfirm={onDisablePublic}
-        onOpenChange={setShowDisable}
-      />
     </div>
   );
 };
